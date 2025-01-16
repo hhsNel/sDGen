@@ -374,34 +374,32 @@ void handleDocs(FILE* fin, FILE* fout) {
  $t ($p)			$t (Paragraph)			$t ()				$t ()				$t ()
  $t ($F)			$t (Line Feed)			$t ()				$t ()				$t ()
  $p
- $c
 */
 
-
-int main(int argc, char** argv) {
-	if(argc == 1) {
-		printf("Usage:\n\
-%s inputFile [outputFile]\n\
-outputFile default = (inputFile).readme.md\n", argv[0]);
-		exit(0);
-	}
-	FILE* fin = fopen(argv[1], "rb");
+/*
+ $c
+ $f (void) (handleFile)
+ $a (char*) (finName) (file name to be read from)
+ $a (char*) (foutName) (file name to be written to)
+ $p
+*/
+void handleFile(char* finName, char* foutName) {
+	FILE* fin = fopen(finName, "rb");
 	if(fin==NULL) {
-		printf("Error opening file %s\n", argv[1]);
+		printf("Error opening file %s\n", finName);
 		exit(1);
 	}
-	char* foutName;
-	if(argc == 3) {
-		foutName = argv[2];
-	} else {
+	int outNameAllocated = 0;
+	if(foutName == NULL) {
 		const char* defaultName = ".readme.md";
-		foutName = malloc(sizeof(char)*(strlen(defaultName)+strlen(argv[1])+1));
+		foutName = malloc(sizeof(char)*(strlen(defaultName)+strlen(finName)+1));
 		if(foutName==NULL) {
 			printf("Error allocating memory\n");
 			exit(1);
 		}
-		strcpy(foutName, argv[1]);
-		strcpy(foutName + strlen(argv[1]), defaultName);
+		strcpy(foutName, finName);
+		strcpy(foutName + strlen(finName), defaultName);
+		outNameAllocated = 1;
 	}
 	FILE* fout = fopen(foutName, "wb");
 	if(fout==NULL) {
@@ -411,10 +409,41 @@ outputFile default = (inputFile).readme.md\n", argv[0]);
 
 	handleDocs(fin, fout);
 
-	if(argc == 3) {
+	if(outNameAllocated) {
 		free(foutName);
 	}
 	fclose(fin);
 	fclose(fout);
+}
+
+int main(int argc, char** argv) {
+	if(argc == 1) {
+		printf("Usage:\n\
+%s [[-o outputFile] inputFile]...\n\
+outputFile default = (inputFile).readme.md\n", argv[0]);
+		exit(0);
+	}
+	
+	char* foutName = NULL;
+	for(unsigned int arg = 1; arg < argc; ++arg) {
+		if(argv[arg][0] == '-') {
+			switch(argv[arg][1]) {
+				case 'o':
+					if(arg+1 >= argc) {
+						printf("Expected another argument after -o\n");
+						exit(1);
+					}
+					foutName = argv[++arg];
+					break;
+				default:
+					printf("Unrecognized argument: %s\n", argv[arg]);
+					exit(1);
+			}
+		} else {
+			char* finName = argv[arg];
+			handleFile(finName, foutName);
+			foutName = NULL;
+		}
+	}
 	return 0;
 }

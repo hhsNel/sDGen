@@ -158,3 +158,12 @@ F - make the last markdown end with a line feed
 
 ---
 
+<<<<<<< HEAD
+=======
+(Function) `void` `handleFile`  
+(Argument 0)
+		`char*` `finName` - file name to be read from  
+(Argument 1)
+		`char*` `foutName` - file name to be written to  
+
+>>>>>>> 61adcc3 (added better argument parsing)
