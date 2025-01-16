@@ -7,7 +7,7 @@
 // $B (3) (sdgen main file)
 
 /*
- $M (expectCAsNextChar) (sets local (previously defined) `char c;` as the next character of the second argument, compares it against the first, then exits if no match) 
+ $M (expectCAsNextChar) (sets local $(previously defined$) `char c;` as the next character of the second argument, compares it against the first, then exits if no match) 
 */
 #define expectCAsNextChar(C, fin) \
 	c = (char)fgetc(fin);\
@@ -26,17 +26,18 @@ void write(FILE* fout, char* str) {
 /*
  $c 
  $f (void) (writeTillParenthasisEnd)
- $a (FILE*) (fin) (read until the number of closeParen characters is greater than the number of openParen characters)
+ $a (FILE*) (fin) (read until closeParen character is read)
  $a (FILE*) (fout) (everything read from fin is forwarded to fout)
  $m (Copies input to output, until EOF or closeParen is encountered)
 */
 void writeTillParenthasisEnd(FILE* fin, FILE* fout) {
 	char c;
 	while((c = (char)fgetc(fin)) != EOF && c != ')') {
-		if(c == '(') {
-			fputc('(', fout);
-			writeTillParenthasisEnd(fin, fout);
-			fputc(')', fout);
+		if(c == '$') {
+			char escaped = (char)fgetc(fin);
+			if(escaped != EOF) {
+				fputc(escaped, fout);
+			}
 		}
 		else fputc(c, fout);
 	}
@@ -60,7 +61,7 @@ void waitTillNoWhitespace(FILE* fin) {
  $f (void) (handleInline)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Parses inline markdown. Usage: $I (\[inline markdown\]) -> \[inline markdown\])
+ $m (Parses inline markdown. Usage: $I $(\[inline markdown\]$) -> \[inline markdown\])
 */
 void handleInline(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -74,7 +75,7 @@ unsigned short int argNr;
  $f (void) (handleFunc)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Handles documenting functions. Usage: $f (\[return type\]) (\[function name\]) -> \{reset internal argument count\} (Function) `[return type]` `[function name]`)
+ $m (Handles documenting functions. Usage: $f $(\[return type\]$) $(\[function name\]$) -> \{reset internal argument count\} $(Function$) `[return type]` `[function name]`)
 */
 void handleFunc(FILE* fin, FILE* fout) {
 	argNr = 0;
@@ -94,11 +95,11 @@ void handleFunc(FILE* fin, FILE* fout) {
  $f (void) (handleArg)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Handles arguments. Usage: $a (\[type\]) (\[name\]) (\[description\]) -> (Argument \{internal argument count\}) \n\t `[type]` `[name]` - \[description\] \{increment internal argument count\})
+ $m (Handles arguments. Usage: $a $(\[type\]$) $(\[name\]$) $(\[description\]$) -> $(Argument \{internal argument count\}$) \n\t `[type]` `[name]` - \[description\] \{increment internal argument count\})
 */
 void handleArg(FILE* fin, FILE* fout) {
 	char argTxt[] = "(Argument \0\0\0\0\0\0";
-	itoa(argNr, argTxt+10, 10);
+	sprintf(argTxt+10, "%d", argNr);
 	strcat(argTxt+11, ")\n");
 	write(fout, argTxt);
 	waitTillNoWhitespace(fin);
@@ -122,7 +123,7 @@ void handleArg(FILE* fin, FILE* fout) {
  $f (void) (handleMacro)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Handles documenting macros. Usage: $M (\[macro name\]) (\[description\]) -> (Macro) `[macro name]` - \[description\])
+ $m (Handles documenting macros. Usage: $M $(\[macro name\]$) $(\[description\]$) -> $(Macro$) `[macro name]` - \[description\]$)
 */
 void handleMacro(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -151,7 +152,7 @@ void handleBeginning(FILE* fin, FILE* fout) {
  $f (void) (handleCustomBeginning)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates a customizable header text. Usage: $B (\[size\]) (\[text\]) -> \{'#' repeated \[size\] times\} \[text\])
+ $m (Creates a customizable header text. Usage: $B $(\[size\]$) $(\[text\]$) -> \{'#' repeated \[size\] times\} \[text\]$)
 */
 void handleCustomBeginning(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -178,7 +179,7 @@ void handleCustomBeginning(FILE* fin, FILE* fout) {
  $f (void) (handleMention)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates text. Usage: $m (\[text\]) -> \[text\]. No functional difference from $i, used when not inserting inline markdown, but plaintext) 
+ $m (Creates text. Usage: $m $(\[text\]$) -> \[text\]. No functional difference from $i, used when not inserting inline markdown, but plaintext) 
 */
 void handleMention(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -192,7 +193,7 @@ void handleMention(FILE* fin, FILE* fout) {
  $f (void) (handleImportant)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates bolded text. Usage: $s (\[text\]) -> \*\*\[text\]\*\*)
+ $m (Creates bolded text. Usage: $s $(\[text\]$) -> \*\*\[text\]\*\*)
 */
 void handleImportant(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -207,7 +208,7 @@ void handleImportant(FILE* fin, FILE* fout) {
  $f (void) (handleTable)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Arranges tables. Usage: $T (\[columns\]) -> \{Set internal column number to \[columns\]. Set internal current column to 0\})
+ $m (Arranges tables. Usage: $T $(\[columns\]$) -> \{Set internal column number to \[columns\]. Set internal current column to 0\})
 */
 int columnNr, currentColumn;
 void handleTable(FILE* fin, FILE* fout) {
@@ -230,7 +231,7 @@ void handleTable(FILE* fin, FILE* fout) {
  $f (void) (handleTableHeader)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates a table header. Usage (After declaring a table with $T): $h (\[header\]) -> \{Constructs a table header\})
+ $m (Creates a table header. Usage (After declaring a table with $T): $h $(\[header\]$) -> \{Constructs a table header\})
 */
 void handleTableHeader(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -257,7 +258,7 @@ void handleTableHeader(FILE* fin, FILE* fout) {
  $f (void) (handleTableCell)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates a table cell. Usage (After declaring a table with $T): $t (\[text\]) -> \{Constructs a table cell\})
+ $m (Creates a table cell. Usage (After declaring a table with $T): $t $(\[text\]$) -> \{Constructs a table cell\})
 */
 void handleTableCell(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
