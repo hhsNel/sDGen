@@ -123,7 +123,7 @@ void handleArg(FILE* fin, FILE* fout) {
  $f (void) (handleMacro)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Handles documenting macros. Usage: $M $(\[macro name\]$) $(\[description\]$) -> $(Macro$) `[macro name]` - \[description\]$)
+ $m (Handles documenting macros. Usage: $M $(\[macro name\]$) $(\[description\]$) -> $(Macro$) `[macro name]` - \[description\])
 */
 void handleMacro(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -152,7 +152,7 @@ void handleBeginning(FILE* fin, FILE* fout) {
  $f (void) (handleCustomBeginning)
  $a (FILE*) (fin) (file to be read from)
  $a (FILE*) (fout) (file to be written to)
- $m (Creates a customizable header text. Usage: $B $(\[size\]$) $(\[text\]$) -> \{'#' repeated \[size\] times\} \[text\]$)
+ $m (Creates a customizable header text. Usage: $B $(\[size\]$) $(\[text\]$) -> \{'#' repeated \[size\] times\} \[text\])
 */
 void handleCustomBeginning(FILE* fin, FILE* fout) {
 	waitTillNoWhitespace(fin);
@@ -275,6 +275,25 @@ void handleTableCell(FILE* fin, FILE* fout) {
 		currentColumn = 0;
 	}
 }
+/*
+ $p
+ $f (void) (handleDefine)
+ $a (FILE*) (fin) (file to be read from)
+ $a (FILE*) (fout) (file to be written to)
+ $m (Handles documenting #defined constants. Usage: $d $(\[defined name\]$) $(\[description\]$) -> $(#defined constant$) `[defined name]` - \[description\])
+*/
+void handleDefine(FILE* fin, FILE* fout) {
+	waitTillNoWhitespace(fin);
+	char c;
+	expectCAsNextChar('(', fin);
+	write(fout, "(#defined constant) `");
+	writeTillParenthasisEnd(fin, fout);
+	waitTillNoWhitespace(fin);
+	expectCAsNextChar('(', fin);
+	write(fout, "` - ");
+	writeTillParenthasisEnd(fin, fout);
+	write(fout, "  \n");	
+}
 
 /*
  $c
@@ -296,7 +315,7 @@ void handleDocs(FILE* fin, FILE* fout) {
 			}
 			c = (char)fgetc(fin);
 			switch(c) {
-				case 'i':	// $m ($i - ignore the next $ sign outside of parsed space) $p
+				case 'i':	// $m ($$i - ignore the next $ sign outside of parsed space) $p
 					ignore = 1;
 					break;
 				case 'f':
@@ -314,7 +333,7 @@ void handleDocs(FILE* fin, FILE* fout) {
 				case 'M':
 					handleMacro(fin, fout);
 					break;
-				case 'q':	// $m ($q - quit the parser and don't parse past this point) $p
+				case 'q':	// $m ($$q - quit the parser and don't parse past this point) $p
 					return;
 				case 'b':
 					handleBeginning(fin, fout);
@@ -325,13 +344,13 @@ void handleDocs(FILE* fin, FILE* fout) {
 				case 'I':
 					handleInline(fin, fout);
 					break;
-				case 'c':	// $m ($c - write a horizontal rule/horizontal rine) $p
+				case 'c':	// $m ($$c - write a horizontal rule/horizontal rine) $p
 					write(fout, "\n---\n\n");
 					break;
-				case 'p':	// $m ($p - separate a paragraph) $p
+				case 'p':	// $m ($$p - separate a paragraph) $p
 					write(fout, "\n");
 					break;
-				case 'F':	// $m ($F - make the last markdown end with a line feed) $p
+				case 'F':	// $m ($$F - make the last markdown end with a line feed) $p
 					fseek(fout, -1L, SEEK_CUR);
 					write(fout, "  \n");
 					break;
@@ -343,6 +362,10 @@ void handleDocs(FILE* fin, FILE* fout) {
 					break;
 				case 't':
 					handleTableCell(fin, fout);
+					break;
+				case 'd':
+					handleDefine(fin, fout);
+					break;
 				//default:
 					
 			}
@@ -357,22 +380,23 @@ void handleDocs(FILE* fin, FILE* fout) {
  $p
  $T (5)
  $h (Escape code)	$h (Meaning)			$h (Argument #0)	$h (Argument #1)	$h (Argument #2)
- $t ($I)			$t (Inline Markdown)	$t (Markdown)		$t ()				$t ()
- $t ($f)			$t (Function)			$t (Return value)	$t (Function name)	$t ()
- $t ($a)			$t (Argument)			$t (Data type)		$t (Name)			$t (Description)
- $t ($M)			$t (Macro)				$t (Name)			$t (Description)	$t ()
- $t ($b)			$t (Beginning/Header)	$t ()				$t ()				$t ()
- $t ($B)			$t (Custom Header)		$t (Size, in #s)	$t (Text)			$t ()
- $t ($m)			$t (Mention)			$t (Text)			$t ()				$t ()
- $t ($s)			$t (Important)			$t (Text)			$t ()				$t ()
- $t ($T)			$t (Table Declaration)	$t (Columns)		$t ()				$t ()
- $t ($h)			$t (Table Header)		$t (Text)			$t ()				$t ()
- $t ($t)			$t (Table Cell)			$t (Text)			$t ()				$t ()
- $t ($i)			$t (Ignore Flag)		$t ()				$t ()				$t ()
- $t ($q)			$t (Quit Parsing)		$t ()				$t ()				$t ()
- $t ($c)			$t (Horizontal Rule)	$t ()				$t ()				$t ()
- $t ($p)			$t (Paragraph)			$t ()				$t ()				$t ()
- $t ($F)			$t (Line Feed)			$t ()				$t ()				$t ()
+ $t ($$I)			$t (Inline Markdown)	$t (Markdown)		$t ()				$t ()
+ $t ($$f)			$t (Function)			$t (Return value)	$t (Function name)	$t ()
+ $t ($$a)			$t (Argument)			$t (Data type)		$t (Name)			$t (Description)
+ $t ($$M)			$t (Macro)				$t (Name)			$t (Description)	$t ()
+ $t ($$b)			$t (Beginning/Header)	$t ()				$t ()				$t ()
+ $t ($$B)			$t (Custom Header)		$t (Size, in #s)	$t (Text)			$t ()
+ $t ($$m)			$t (Mention)			$t (Text)			$t ()				$t ()
+ $t ($$s)			$t (Important)			$t (Text)			$t ()				$t ()
+ $t ($$T)			$t (Table Declaration)	$t (Columns)		$t ()				$t ()
+ $t ($$h)			$t (Table Header)		$t (Text)			$t ()				$t ()
+ $t ($$t)			$t (Table Cell)			$t (Text)			$t ()				$t ()
+ $t ($$d)			$t (A #defined constant)	$t (Name)			$t(Description)			$t ()
+ $t ($$i)			$t (Ignore Flag)		$t ()				$t ()				$t ()
+ $t ($$q)			$t (Quit Parsing)		$t ()				$t ()				$t ()
+ $t ($$c)			$t (Horizontal Rule)	$t ()				$t ()				$t ()
+ $t ($$p)			$t (Paragraph)			$t ()				$t ()				$t ()
+ $t ($$F)			$t (Line Feed)			$t ()				$t ()				$t ()
  $p
 */
 
