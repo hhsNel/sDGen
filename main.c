@@ -459,6 +459,28 @@ outputFile default = (inputFile).readme.md\n", argv[0]);
 					}
 					foutName = argv[++arg];
 					break;
+				case 'h':
+					printf("\
+| Escape code | Meaning             | Argument #0  | Argument #1   | Argument #2 | \n\
+| ----------- | ------------------- | ------------ | ------------- | ----------- | \n\
+| $I          | Inline Markdown     | Markdown     |               |             | \n\
+| $f          | Function            | Return value | Function name |             | \n\
+| $a          | Argument            | Data type    | Name          | Description | \n\
+| $M          | Macro               | Name         | Description   |             | \n\
+| $b          | Beginning/Header    |              |               |             | \n\
+| $B          | Custom Header       | Size, in #s  | Text          |             | \n\
+| $m          | Mention             | Text         |               |             | \n\
+| $s          | Important           | Text         |               |             | \n\
+| $T          | Table Declaration   | Columns      |               |             | \n\
+| $h          | Table Header        | Text         |               |             | \n\
+| $t          | Table Cell          | Text         |               |             | \n\
+| $d          | A #defined constant | Name         | Description   |             | \n\
+| $i          | Ignore Flag         |              |               |             | \n\
+| $q          | Quit Parsing        |              |               |             | \n\
+| $c          | Horizontal Rule     |              |               |             | \n\
+| $p          | Paragraph           |              |               |             | \n\
+| $F          | Line Feed           |              |               |             | \n");
+					exit(0);
 				default:
 					printf("Unrecognized argument: %s\n", argv[arg]);
 					exit(1);
