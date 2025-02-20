@@ -1,0 +1,8 @@
+$f (returnT) (fName)
+$a (type) (name) (used as dummy)
+$a (type2) (name2) (also a dummy)
+$I (
+some `inline` **markdown**
+)
+$q
+$i (this should not be parsed)
