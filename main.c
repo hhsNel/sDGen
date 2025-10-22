@@ -502,6 +502,7 @@ outputFile default = (inputFile)%s\n", argv[0], outputSuffix);
 | $h          | Table Header        | Text         |               |             | \n\
 | $t          | Table Cell          | Text         |               |             | \n\
 | $d          | A #defined constant | Name         | Description   |             | \n\
+| $e          | Typedef             | Type         | Name          |             | \n\
 | $i          | Ignore Flag         |              |               |             | \n\
 | $q          | Quit Parsing        |              |               |             | \n\
 | $c          | Horizontal Rule     |              |               |             | \n\
