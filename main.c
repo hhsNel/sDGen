@@ -311,7 +311,7 @@ void handleTypedef(FILE* fin, FILE* fout) {
 	writeTillParenthasisEnd(fin, fout);
 	waitTillNoWhitespace(fin);
 	expectCAsNextChar('(', fin);
-	write(fout, "` `typedef`-ed as `");
+	write(fout, "` - `");
 	writeTillParenthasisEnd(fin, fout);
 	write(fout, "`  \n");	
 }
