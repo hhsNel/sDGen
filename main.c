@@ -468,7 +468,7 @@ void handleFile(char* finName, char* foutName) {
 int main(int argc, char** argv) {
 	if(argc == 1) {
 		printf("Usage:\n\
-%s [[-o outputFile] inputFile]...\n\
+%s --help | [[-o|--output outputFile] inputFile]...\n\
 outputFile default = (inputFile)%s\n", argv[0], outputSuffix);
 		exit(0);
 	}
@@ -478,6 +478,7 @@ outputFile default = (inputFile)%s\n", argv[0], outputSuffix);
 		if(argv[arg][0] == '-') {
 			switch(argv[arg][1]) {
 				case 'o':
+				output:
 					if(arg+1 >= argc) {
 						printf("Expected another argument after -o\n");
 						exit(1);
@@ -485,6 +486,7 @@ outputFile default = (inputFile)%s\n", argv[0], outputSuffix);
 					foutName = argv[++arg];
 					break;
 				case 'h':
+				help:
 					printf("\
 | Escape code | Meaning             | Argument #0  | Argument #1   | Argument #2 | \n\
 | ----------- | ------------------- | ------------ | ------------- | ----------- | \n\
@@ -506,6 +508,12 @@ outputFile default = (inputFile)%s\n", argv[0], outputSuffix);
 | $p          | Paragraph           |              |               |             | \n\
 | $F          | Line Feed           |              |               |             | \n");
 					exit(0);
+				case '-':
+					if(!strcmp(argv[arg], "--output")) {
+						goto output;
+					} else if (!strcmp(argv[arg], "--help")) {
+						goto help;
+					}
 				default:
 					printf("Unrecognized argument: %s\n", argv[arg]);
 					exit(1);

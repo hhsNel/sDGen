@@ -160,7 +160,7 @@ $F - make the last markdown end with a line feed
 | $h | Table Header | Text |  |  | 
 | $t | Table Cell | Text |  |  | 
 | $d | A #defined constant | Name | Description |  | 
-| $e | A typedef | Type | Name |  | 
+| $e | Typedef | Type | Name |  | 
 | $i | Ignore Flag |  |  |  | 
 | $q | Quit Parsing |  |  |  | 
 | $c | Horizontal Rule |  |  |  | 
