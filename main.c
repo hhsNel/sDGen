@@ -296,6 +296,25 @@ void handleDefine(FILE* fin, FILE* fout) {
 	writeTillParenthasisEnd(fin, fout);
 	write(fout, "  \n");	
 }
+/*
+ $p
+ $f (void) (handleTypedef)
+ $a (FILE*) (fin) (file to be read from)
+ $a (FILE*) (fout) (file to be written to)
+ $m (Creates a typedef. Usage: $d $(\[defined name\]$) $(\[description\]$) -> $(#defined constant$) `[defined name]` - \[description\])
+*/
+void handleTypedef(FILE* fin, FILE* fout) {
+	waitTillNoWhitespace(fin);
+	char c;
+	expectCAsNextChar('(', fin);
+	write(fout, "(Typedef) `");
+	writeTillParenthasisEnd(fin, fout);
+	waitTillNoWhitespace(fin);
+	expectCAsNextChar('(', fin);
+	write(fout, "` `typedef`-ed as `");
+	writeTillParenthasisEnd(fin, fout);
+	write(fout, "`  \n");	
+}
 
 /*
  $c
@@ -368,6 +387,9 @@ void handleDocs(FILE* fin, FILE* fout) {
 				case 'd':
 					handleDefine(fin, fout);
 					break;
+				case 'e':
+					handleTypedef(fin, fout);
+					break;
 				//default:
 					
 			}
@@ -393,7 +415,8 @@ void handleDocs(FILE* fin, FILE* fout) {
  $t ($$T)			$t (Table Declaration)	$t (Columns)		$t ()				$t ()
  $t ($$h)			$t (Table Header)		$t (Text)			$t ()				$t ()
  $t ($$t)			$t (Table Cell)			$t (Text)			$t ()				$t ()
- $t ($$d)			$t (A #defined constant)	$t (Name)			$t(Description)			$t ()
+ $t ($$d)			$t (A #defined constant)$t (Name)			$t(Description)		$t ()
+ $t ($$e)			$t (Typedef)			$t (Type)			$t(Name)			$t ()
  $t ($$i)			$t (Ignore Flag)		$t ()				$t ()				$t ()
  $t ($$q)			$t (Quit Parsing)		$t ()				$t ()				$t ()
  $t ($$c)			$t (Horizontal Rule)	$t ()				$t ()				$t ()
